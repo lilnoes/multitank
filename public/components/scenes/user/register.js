@@ -1,23 +1,25 @@
-import { getButton } from "./button.js";
+import { getButton } from "../../ui/button.js";
 
-export default class LoginScene extends Phaser.Scene {
+export default class RegisterScene extends Phaser.Scene {
   preload() {
-    this.load.html("login", "assets/html/login.html");
+    this.load.image("bg", "assets/bg1.png");
+    this.load.html("register", "assets/html/register.html");
   }
   create() {
-    let dom1 = this.add.dom(400, 300).createFromCache("login");
+    this.add.image(400, 400, "bg");
+    let dom1 = this.add.dom(400, 300).createFromCache("register");
     let registerButton = getButton(this, "Register", () => {
-      this.scene.start("Register");
+      // this.scene.start("Register");
     });
     let loginButton = getButton(this, "Login", () => {
-      console.log("clicked from login");
+      this.scene.start("Login");
     });
 
     let buttonContainer = this.add.container(200, 100).setSize(200, 100);
-    buttonContainer.add([loginButton, registerButton]);
+    buttonContainer.add([registerButton, loginButton]);
 
     Phaser.Actions.AlignTo(
-      [loginButton, registerButton],
+      [registerButton, loginButton],
       Phaser.Display.Align.RIGHT_CENTER,
       10
     );
