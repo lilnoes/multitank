@@ -1,3 +1,7 @@
+import MainMenu from "./components/menu/main.js";
+import LoginScene from "./components/ui/login.js";
+import RegisterScene from "./components/ui/register.js";
+
 // Main scene
 class MainScene extends Phaser.Scene {
   constructor() {
@@ -103,4 +107,6 @@ const config = {
 
 // Create a new Phaser game instance
 const game = new Phaser.Game(config);
-game.scene.add("Register", RegisterScene, true);
+game.scene.add("Register", RegisterScene, false);
+game.scene.add("Login", LoginScene, false);
+game.scene.add("MainMenu", MainMenu, true);
