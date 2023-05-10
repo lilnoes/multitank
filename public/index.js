@@ -1,5 +1,10 @@
-import MainMenu from "./components/menu/main.js";
+import LiderTablosuScene from "./components/scenes/game/lidertablosu.js";
+import OyunBeklemeScene from "./components/scenes/game/oyunbekleme.js";
+import OyunKurScene from "./components/scenes/game/oyunkur.js";
+import OyunSonuScene from "./components/scenes/game/oyunson.js";
 import LobbyScene from "./components/scenes/lobby/lobby.js";
+import MainMenu from "./components/scenes/menu/mainmenu.js";
+import HakkindaScene from "./components/scenes/user/hakkinda.js";
 import LoginScene from "./components/scenes/user/login.js";
 import RegisterScene from "./components/scenes/user/register.js";
 
@@ -22,7 +27,12 @@ const config = {
 
 // Create a new Phaser game instance
 const game = new Phaser.Game(config);
-game.scene.add("Register", RegisterScene, false);
-game.scene.add("Login", LoginScene, false);
-game.scene.add("MainMenu", MainMenu, false);
-game.scene.add("Lobby", LobbyScene, true);
+game.scene.add(RegisterScene.KEY, RegisterScene, false);
+game.scene.add(LoginScene.KEY, LoginScene, false);
+game.scene.add(MainMenu.KEY, MainMenu, true);
+game.scene.add(LobbyScene.KEY, LobbyScene, false);
+game.scene.add(OyunKurScene.KEY, OyunKurScene, false);
+game.scene.add(OyunBeklemeScene.KEY, OyunBeklemeScene, false);
+game.scene.add(OyunSonuScene.KEY, OyunSonuScene, false);
+game.scene.add(LiderTablosuScene.KEY, LiderTablosuScene, false);
+game.scene.add(HakkindaScene.KEY, HakkindaScene, false);

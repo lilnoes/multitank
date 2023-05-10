@@ -1,6 +1,7 @@
 import { getButton } from "../../ui/button.js";
 
 export default class LobbyScene extends Phaser.Scene {
+  static KEY = "LobbyScene";
   preload() {
     this.load.image("bg", "assets/bg1.png");
     this.load.html("chat", "assets/html/chat.html");
