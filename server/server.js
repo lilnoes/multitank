@@ -1,8 +1,16 @@
 import net from "net";
 import parseIncomingMessage from "./modules/index.js";
+import { CLIENTS } from "./globals.js";
 
 const server = net.createServer((socket) => {
   socket.on("data", async (data) => {
+    if (!CLIENTS.has(socket.remoteAddress)) {
+      CLIENTS.set(socket.remoteAddress, socket);
+      console.log("new connection", CLIENTS.size);
+    }
+    socket.setKeepAlive(true, 7200);
+    console.log("id", socket.remoteAddress);
+    socket.id = 1000;
     try {
       let res = await parseIncomingMessage(socket, data);
       console.log(res);

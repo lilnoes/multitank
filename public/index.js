@@ -30,8 +30,8 @@ const config = {
 const game = new Phaser.Game(config);
 game.scene.add(RegisterScene.KEY, RegisterScene, false);
 game.scene.add(LoginScene.KEY, LoginScene, false);
-game.scene.add(MainMenu.KEY, MainMenu, false);
-game.scene.add(LobbyScene.KEY, LobbyScene, true);
+game.scene.add(MainMenu.KEY, MainMenu, true);
+game.scene.add(LobbyScene.KEY, LobbyScene, false);
 game.scene.add(OyunKurScene.KEY, OyunKurScene, false);
 game.scene.add(OyunBeklemeScene.KEY, OyunBeklemeScene, false);
 game.scene.add(OyunSonuScene.KEY, OyunSonuScene, false);
