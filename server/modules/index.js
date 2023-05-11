@@ -1,17 +1,19 @@
-import { WebSocket } from "ws";
-import { REGISTERUSERMESSAGE } from "./register.js";
 import { UNKNOWNMESSAGE } from "./unknown.js";
+import { REGISTERUSERMESSAGE } from "./register/registeruser.js";
+import { LOGINMESSAGE } from "./login/login.js";
 
-const messages = [REGISTERUSERMESSAGE];
+const messages = [REGISTERUSERMESSAGE, LOGINMESSAGE];
 
 /**
  *
- * @param {WebSocket} ws
- * @param {import("ws").RawData} message
+ * @param {net.Socket} ws
+ * @param {Buffer} message
  */
-export default function parseIncomingMessage(ws, message) {
-  let json = JSON.parse(message.toString());
+export default async function parseIncomingMessage(socket, data) {
+  let json = JSON.parse(data.toString());
+  console.log(json);
   if (json.type == null) return UNKNOWNMESSAGE;
-  for (let message of messages) if (message.verify(json)) return null;
+  for (let message of messages)
+    if (await message.handle(json, socket)) return null;
   return UNKNOWNMESSAGE;
 }

@@ -2,11 +2,11 @@
   "name": "multitank",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "main.cjs",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.cjs",
+    "start": "electron .",
     "server": "nodemon --ignore public/ --ignore client/  ./server/server.js"
   },
   "author": "",
@@ -19,5 +19,8 @@
     "react-scripts": "^5.0.1",
     "uuid": "^9.0.0",
     "ws": "^8.13.0"
+  },
+  "devDependencies": {
+    "electron": "^24.3.0"
   }
 }

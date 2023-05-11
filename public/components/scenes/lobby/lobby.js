@@ -58,6 +58,12 @@ export default class LobbyScene extends Phaser.Scene {
         // console.log("oyun");
       })
     );
+    let button = getButton(this, "Yeni oyun", () => {
+      this.data.events.emit("lobby", { name: "Leon", message: "Hello" });
+    }).setPosition(500, 300);
+    this.data.events.on("lobby", (data) => {
+      console.log("received", data);
+    });
     usersGroup.getChildren()[0].setPosition(150, 60);
     gamesGroup.getChildren()[0].setPosition(500, 60);
     for (let user of users) {

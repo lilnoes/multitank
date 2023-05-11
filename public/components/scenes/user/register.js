@@ -1,19 +1,24 @@
+import { IDMESSAGE } from "../../../../server/modules/register/id.js";
+import { REGISTERUSERMESSAGE } from "../../../../server/modules/register/registeruser.js";
+import { isSocketOpen } from "../../../client/client.js";
 import { getButton } from "../../ui/button.js";
+import LoginScene from "./login.js";
 
 export default class RegisterScene extends Phaser.Scene {
   static KEY = "RegisterScene";
   preload() {
     this.load.image("bg", "assets/bg1.png");
     this.load.html("register", "assets/html/register.html");
+    this.listening = false;
   }
   create() {
     this.add.image(400, 400, "bg");
     let dom1 = this.add.dom(400, 300).createFromCache("register");
-    let registerButton = getButton(this, "Register", () => {
-      // this.scene.start("Register");
+    let registerButton = getButton(this, "Register", async () => {
+      await this.sendData();
     });
     let loginButton = getButton(this, "Login", () => {
-      this.scene.start("Login");
+      this.scene.start(LoginScene.KEY);
     });
 
     let buttonContainer = this.add.container(200, 100).setSize(200, 100);
@@ -32,4 +37,30 @@ export default class RegisterScene extends Phaser.Scene {
     );
     // buttonContainer.x += 50
   }
+
+  async sendData() {
+    let socket = await isSocketOpen(this.registry.get("socket"));
+    socket.removeListener("data", this.idListener);
+    socket.addListener("data", this.idListener);
+    let name = document.getElementById("name").value;
+    let email = document.getElementById("email").value;
+    let password = document.getElementById("password").value;
+    socket.write(
+      JSON.stringify({
+        type: REGISTERUSERMESSAGE.message.type,
+        name,
+        email,
+        password,
+      })
+    );
+  }
+
+  idListener = async (data) => {
+    let message = JSON.parse(data.toString());
+    if (message.type == IDMESSAGE.message.type) {
+      this.registry.set("id", message.id);
+      console.log("received id", data.toString());
+      this.scene.start(LoginScene.KEY);
+    }
+  };
 }
