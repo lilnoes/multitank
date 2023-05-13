@@ -25,13 +25,16 @@ export default class GameScene extends Phaser.Scene {
     // this.tank = this.add.image(400, 400, "tank");
     // this.tank2 = this.add.image(100, 100, "tank");
 
-    this.getTank("Leon");
-    this.getTank("Emma", 100, 60, "30");
-    this.getTank("Azza", 600, 60, "80");
+    let t1 = this.getTank("Leon");
+    let t2 = this.getTank("Emma", 100, 60, "30");
+    let t3 = this.getTank("Azza", 600, 60, "80");
+    let ret = new Phaser.Geom.Rectangle(100, 60, 650, 450);
+    Phaser.Actions.RandomRectangle([t1, t2, t3], ret);
   }
 
   getTank(name, x = 400, y = 400, id = "10") {
     const tankContainer = this.add.container();
+    tankContainer.setSize(100, 100);
     tankContainer.setSize(50, 50);
     let tank = this.add.image(0, 0, "tank");
     const text = this.add.text(-40, -50, name);
@@ -80,6 +83,7 @@ export default class GameScene extends Phaser.Scene {
       // window.red = tank.red.sets;
       // tank.red.displayWidth(red.width - 3);
     });
+    return tankContainer;
   }
 
   update() {
