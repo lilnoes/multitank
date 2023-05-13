@@ -36,7 +36,7 @@ export default class OyunBeklemeScene extends Phaser.Scene {
 
     this.group = this.add.group();
     getButton(this, "Start", () => {
-      this.scene.start(GameScene.KEY);
+      this.scene.start(GameScene.KEY, { gameid });
     })
       .setPosition(400, 500)
       .setVisible(owner);
