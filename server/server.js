@@ -4,16 +4,18 @@ import { CLIENTS } from "./globals.js";
 
 const server = net.createServer((socket) => {
   socket.on("data", async (data) => {
-    if (!CLIENTS.has(socket.remoteAddress)) {
-      CLIENTS.set(socket.remoteAddress, socket);
-      console.log("new connection", CLIENTS.size);
-    }
-    socket.setKeepAlive(true, 7200);
-    console.log("id", socket.remoteAddress);
-    socket.id = 1000;
     try {
+      socket.setKeepAlive(true, 7200);
+      let json = JSON.parse(data.toString());
+      console.log("json", json);
+      // for (let client of CLIENTS.values()) client.write("emma server");
+      // for (let client of CLIENTS.values()) console.log("status", client.closed);
+      if (json.ID != null) {
+        // console.log("id", json.ID);
+        CLIENTS.set(json.ID, socket);
+      }
       let res = await parseIncomingMessage(socket, data);
-      console.log(res);
+      // console.log("response", res);
       // console.log(parseIncomingMessage(ws, data));
     } catch (e) {
       console.log("error while parsing", data.toString(), e);

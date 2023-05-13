@@ -1,11 +1,5 @@
 export default class GameScene extends Phaser.Scene {
-  constructor() {
-    super("MainScene");
-    this.x = 400;
-    this.y = 400;
-    this.rotation = -Math.PI / 2;
-  }
-
+  static KEY = "GAMESCENE";
   preload() {
     // Preload assets (if needed)
     this.load.image("bg", "assets/bg.png");
@@ -14,6 +8,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create() {
+    this.rotation = -Math.PI / 2;
     this.space = this.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.SPACE
     );

@@ -1,7 +1,7 @@
-import { IDMESSAGE } from "../register/id.js";
+import { CLIENTS } from "../../globals.js";
 
-export const LOGINMESSAGE = {
-  message: { type: "CHATSENT", name: "", message: "" },
+export const SERVERCHATSENT = {
+  message: { type: "SERVERCHATSENT", name: "", message: "", ID: "" },
   /**
    *
    * @param {String} json
@@ -14,9 +14,8 @@ export const LOGINMESSAGE = {
       json.name != null &&
       json.message != null
     ) {
-      let id = await loginUser(json.email, json.password);
-      let message = { ...IDMESSAGE.message, id };
-      socket.write(JSON.stringify(message));
+      let message = { ...this.message, name: json.name, message: json.message };
+      for (let client of CLIENTS.values()) client.write(message);
     }
     return false;
   },

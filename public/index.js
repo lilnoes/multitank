@@ -1,4 +1,4 @@
-const net = require("net");
+import GameScene from "./components/scenes/game/game.js";
 import LiderTablosuScene from "./components/scenes/game/lidertablosu.js";
 import OyunBeklemeScene from "./components/scenes/game/oyunbekleme.js";
 import OyunKurScene from "./components/scenes/game/oyunkur.js";
@@ -28,12 +28,16 @@ const config = {
 
 // Create a new Phaser game instance
 const game = new Phaser.Game(config);
+game.registry.set("ID", Math.random().toString());
+game.registry.set("name", "Leon" + Math.random().toString().substring(0, 4));
+
 game.scene.add(RegisterScene.KEY, RegisterScene, false);
 game.scene.add(LoginScene.KEY, LoginScene, false);
-game.scene.add(MainMenu.KEY, MainMenu, true);
+game.scene.add(MainMenu.KEY, MainMenu, false);
 game.scene.add(LobbyScene.KEY, LobbyScene, false);
 game.scene.add(OyunKurScene.KEY, OyunKurScene, false);
 game.scene.add(OyunBeklemeScene.KEY, OyunBeklemeScene, false);
 game.scene.add(OyunSonuScene.KEY, OyunSonuScene, false);
 game.scene.add(LiderTablosuScene.KEY, LiderTablosuScene, false);
 game.scene.add(HakkindaScene.KEY, HakkindaScene, false);
+game.scene.add(GameScene.KEY, GameScene, true);

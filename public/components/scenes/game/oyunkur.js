@@ -1,4 +1,7 @@
+import { OYUNSETUP } from "../../../../server/modules/setup/oyunsetup.js";
+import { getUUID } from "../../../client/id.js";
 import { getButton } from "../../ui/button.js";
+import OyunBeklemeScene from "./oyunbekleme.js";
 
 export default class OyunKurScene extends Phaser.Scene {
   static KEY = "OyunKurScene";
@@ -10,7 +13,16 @@ export default class OyunKurScene extends Phaser.Scene {
     this.add.image(400, 400, "bg");
     let dom1 = this.add.dom(400, 300).createFromCache("oyunkur");
     let registerButton = getButton(this, "Save", () => {
-      // this.scene.start("Register");
+      let socket = this.registry.get("socket");
+      let name = document.getElementById("name").value;
+      let time = document.getElementById("charge").value;
+      if (name == null || time == null) return;
+      time = parseInt(time);
+      let ID = this.registry.get("ID");
+      let gameid = getUUID();
+      let message = { ...OYUNSETUP.message, ID, gameid, name, time };
+      socket.write(JSON.stringify(message));
+      this.scene.start(OyunBeklemeScene.KEY, { gameid, owner: true });
     });
     Phaser.Actions.AlignTo(
       [dom1, registerButton],
