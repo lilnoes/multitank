@@ -1,4 +1,5 @@
 import { OYUNSETUP } from "../../../../server/modules/setup/oyunsetup.js";
+import { sendMessage } from "../../../client/client.js";
 import { getUUID } from "../../../client/id.js";
 import { getButton } from "../../ui/button.js";
 import OyunBeklemeScene from "./oyunbekleme.js";
@@ -21,7 +22,7 @@ export default class OyunKurScene extends Phaser.Scene {
       let ID = this.registry.get("ID");
       let gameid = getUUID();
       let message = { ...OYUNSETUP.message, ID, gameid, name, time };
-      socket.write(JSON.stringify(message));
+      sendMessage(socket, message);
       this.scene.start(OyunBeklemeScene.KEY, { gameid, owner: true });
     });
     Phaser.Actions.AlignTo(

@@ -12,15 +12,6 @@ export const LOBBYUSER = {
    */
   handle: async function (json, socket) {
     if (json.type == this.message.type) {
-      // USERS.add(json.name);
-
-      // let message = {
-      //   ...LOBBYINIT.message,
-      //   users: Array.from(USERS),
-      //   games: Array.from(GAMES),
-      // };
-      // socket.write(JSON.stringify(message));
-
       return true;
     }
     return false;

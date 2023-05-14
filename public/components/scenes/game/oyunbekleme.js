@@ -4,6 +4,7 @@ import { NEWGAMEUSER } from "../../../../server/modules/waiting/newgameuser.js";
 import { REGISTERGAMEUSER } from "../../../../server/modules/waiting/registergameuser.js";
 import { RENDERPROGRESS } from "../../../../server/modules/waiting/renderprogress.js";
 import { STARTRENDER } from "../../../../server/modules/waiting/startrender.js";
+import { sendMessage } from "../../../client/client.js";
 import { sleep } from "../../../client/time.js";
 import { getSocketID } from "../../../client/utils.js";
 import { getButton } from "../../ui/button.js";
@@ -22,17 +23,16 @@ export default class OyunBeklemeScene extends Phaser.Scene {
     const name = this.registry.get("name");
 
     const handleNewGameUser = (data) => {
-      data = JSON.parse(data.toString());
-      if (data.type != NEWGAMEUSER.message.type) return;
+      // if (data.type != NEWGAMEUSER.message.type) return;
       if (data.gameid != gameid) return;
       this.addToGroup(data.name);
     };
 
-    this.socket.on("data", handleNewGameUser);
+    this.game.events.on(NEWGAMEUSER.message.type, handleNewGameUser);
     let message = { ...REGISTERGAMEUSER.message, ID: this.ID, name, gameid };
-    this.socket.write(JSON.stringify(message));
+    sendMessage(this.socket, message);
     this.events.on("shutdown", () => {
-      this.socket.removeListener("data", handleNewGameUser);
+      this.game.events.off(NEWGAMEUSER.message.type, handleNewGameUser);
     });
     this.add.image(400, 400, "bg");
     this.oyuncuButton = getButton(this, "Oyuncular", () => {
@@ -40,18 +40,17 @@ export default class OyunBeklemeScene extends Phaser.Scene {
     }).setPosition(400, 50);
 
     this.group = this.add.group();
+    this.game.events.on(CLIENTSTARTRENDER.message.type, this.handleStartRender);
     getButton(this, "Start", () => {
-      this.socket.on("data", this.handleStartRender);
       let message = { ...STARTRENDER.message, gameid };
-      this.socket.write(JSON.stringify(message));
+      sendMessage(this.socket, message);
     })
       .setPosition(400, 500)
       .setVisible(owner);
   }
 
   handleStartRender = async (data) => {
-    data = JSON.parse(data.toString());
-    if (data.type != CLIENTSTARTRENDER.message.type) return;
+    // if (data.type != CLIENTSTARTRENDER.message.type) return;
     if (data.gameid != this.gameid) return;
     this.scene.launch(GameScene.KEY, { gameid: this.gameid });
     this.scene.get(GameScene.KEY).load.on("progress", async (val) => {
@@ -62,15 +61,15 @@ export default class OyunBeklemeScene extends Phaser.Scene {
         progress: val,
       };
       let ms = Math.random() * 500;
-      await sleep(40);
-      this.socket.write(JSON.stringify(message));
+      sendMessage(this.socket, message);
     });
     this.scene.get(GameScene.KEY).events.once("start", () => {
       this.scene.setVisible(false, GameScene.KEY);
     });
+    if (!this.owner) return;
     await sleep(2000);
     let message = { ...GAMEREADY.message, gameid: this.gameid };
-    this.socket.write(JSON.stringify(message));
+    sendMessage(this.socket, message);
   };
 
   addToGroup(name) {

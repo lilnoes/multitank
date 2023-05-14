@@ -29,7 +29,7 @@ export const OYUNSETUP = {
           users: game.users.size,
         };
         for (let client of CLIENTS.values()) {
-          await sendToSocket(client, JSON.stringify(message));
+          await sendToSocket(client, message);
         }
       }
       return true;

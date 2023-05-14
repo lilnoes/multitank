@@ -23,14 +23,11 @@ const messages = [
 
 /**
  *
- * @param {net.Socket} ws
- * @param {Buffer} message
+ * @param {net.Socket} socket
+ * @param {Buffer} event
  */
-export default async function parseIncomingMessage(socket, data) {
-  let json = JSON.parse(data.toString());
-  // console.log("coming", json);
-  if (json.type == null) return UNKNOWNMESSAGE;
+export default async function handleIncomingEvent(socket, event) {
   for (let message of messages)
-    if (await message.handle(json, socket)) return null;
+    if (await message.handle(event, socket)) return null;
   return UNKNOWNMESSAGE;
 }

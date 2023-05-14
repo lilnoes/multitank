@@ -9,6 +9,7 @@ export const LOGINMESSAGE = {
    * @returns
    */
   handle: async function (json, socket) {
+    const { sendToSocket } = await import("../../utils/socket.js");
     if (
       json.type == this.message.type &&
       json.email != null &&
@@ -16,7 +17,7 @@ export const LOGINMESSAGE = {
     ) {
       let id = await loginUser(json.email, json.password);
       let message = { ...IDMESSAGE.message, id };
-      socket.write(JSON.stringify(message));
+      await sendToSocket(socket, message);
     }
     return false;
   },

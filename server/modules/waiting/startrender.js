@@ -16,7 +16,7 @@ export const STARTRENDER = {
     if (json.type == this.message.type) {
       for (let user of GAMES.get(json.gameid).users.values()) {
         let message = { ...CLIENTSTARTRENDER.message, gameid: json.gameid };
-        await sendToSocket(CLIENTS.get(user.ID), JSON.stringify(message));
+        await sendToSocket(CLIENTS.get(user.ID), message);
       }
       return true;
     }

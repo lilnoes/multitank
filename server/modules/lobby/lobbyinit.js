@@ -23,7 +23,7 @@ export const LOBBYINIT = {
           name: user,
         };
         for (let client of CLIENTS.values()) {
-          await sendToSocket(client, JSON.stringify(message));
+          await sendToSocket(client, message);
         }
       }
       for (let game of GAMES.values()) {
@@ -34,7 +34,7 @@ export const LOBBYINIT = {
           creator: 1,
         };
         for (let client of CLIENTS.values()) {
-          await sendToSocket(client, JSON.stringify(message));
+          await sendToSocket(client, message);
         }
       }
       return true;

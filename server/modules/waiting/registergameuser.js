@@ -33,7 +33,7 @@ export const REGISTERGAMEUSER = {
           name: user.name,
         };
         for (let user of GAMES.get(json.gameid).users.values())
-          await sendToSocket(CLIENTS.get(user.ID), JSON.stringify(message));
+          await sendToSocket(CLIENTS.get(user.ID), message);
       }
       return true;
     }

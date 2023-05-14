@@ -12,9 +12,6 @@ export default class InitScene extends Phaser.Scene {
       this.socket = await isSocketOpen(this.registry.get("socket"), this.game);
       this.registry.set("socket", this.socket);
 
-      // this.socket.on("data", (data) => {
-      //   console.log("data", data.toString());
-      // });
       res();
     });
   }

@@ -9,6 +9,7 @@ export const REGISTERUSERMESSAGE = {
    * @returns
    */
   handle: async function (json, socket) {
+    const { sendToSocket } = await import("../../utils/socket.js");
     if (
       json.type == this.message.type &&
       json.name != null &&
@@ -16,7 +17,7 @@ export const REGISTERUSERMESSAGE = {
     ) {
       let id = await registerUser(json.name, json.email, json.password);
       let message = { ...IDMESSAGE.message, id };
-      socket.write(JSON.stringify(message));
+      await sendToSocket(socket, message);
     }
     return false;
   },

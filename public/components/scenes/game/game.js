@@ -16,19 +16,16 @@ export default class GameScene extends Phaser.Scene {
   }
 
   handleGameStart = (data) => {
-    data = JSON.parse(data.toString());
-    if (data.type != GAMESTART.message.type) return;
-    for (let user of data.users)
-      this.tanksGroup.add(this.getTank(user.name, user.ID));
-    let shape = new Phaser.Geom.Ellipse(400, 300, 400, 400);
-    Phaser.Actions.PlaceOnEllipse(this.tanksGroup.getChildren(), shape);
+    console.log("her");
+    // if (data.type != GAMESTART.message.type) return;
+    for (let user of data.users) this.tanksGroup.add(this.getTank(user));
     this.scene.setVisible(true);
   };
 
   create({ gameid }) {
     this.gameid = gameid;
     [this.socket, this.ID] = getSocketID(this);
-    this.socket.on("data", this.handleGameStart);
+    this.game.events.on(GAMESTART.message.type, this.handleGameStart);
     this.physics.world.setBoundsCollision();
     this.space = this.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.SPACE
@@ -41,12 +38,12 @@ export default class GameScene extends Phaser.Scene {
     this.add.image(400, 400, "bg");
   }
 
-  getTank(name, ID = "10") {
+  getTank(user) {
     -Math.PI / 2;
     const tankContainer = this.add.container();
     tankContainer.setSize(50, 50);
     const tank = this.add.image(0, 0, "tank");
-    const text = this.add.text(-40, -50, name);
+    const text = this.add.text(-40, -50, user.name);
     const score = this.add.text(-40, -50, "0");
     const height = text.height;
     const white = this.add
@@ -60,8 +57,9 @@ export default class GameScene extends Phaser.Scene {
     tank.setOrigin(0.7, 0.7);
     tank.body.setImmovable(true);
     tank.body.setSize(40, 40);
-    tank.id = ID;
+    tank.id = user.ID;
 
+    Phaser.Actions.AlignTo([tank, text], Phaser.Display.Align.TOP_LEFT, 1);
     Phaser.Actions.AlignTo(
       [text, white],
       Phaser.Display.Align.RIGHT_CENTER,
@@ -74,9 +72,11 @@ export default class GameScene extends Phaser.Scene {
     );
     red.setPosition(white.x, white.y);
     tankContainer.add([tank, white, red, text, score]);
-    tankContainer.id = ID;
-    if (ID == this.ID) this.tankContainer = tankContainer;
-    // return tankContainer;
+    tankContainer.id = user.ID;
+    if (user.ID == this.ID) this.tankContainer = tankContainer;
+
+    tankContainer.setPosition(user.x, user.y);
+    tankContainer.setAngle(user.angle);
 
     this.physics.add.collider(this.bullets, tank, (tank, bullet) => {
       if (tank.ID == bullet.ID) return;

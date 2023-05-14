@@ -3,7 +3,7 @@ import { LOBBYGAME } from "../../../../server/modules/lobby/lobbygame.js";
 import { LOBBYINIT } from "../../../../server/modules/lobby/lobbyinit.js";
 import { LOBBYUSER } from "../../../../server/modules/lobby/lobbyuser.js";
 import { SERVERCHATSENT } from "../../../../server/modules/lobby/serverchatsent.js";
-import { isSocketOpen } from "../../../client/client.js";
+import { isSocketOpen, sendMessage } from "../../../client/client.js";
 import { getSocketID } from "../../../client/utils.js";
 import { getButton } from "../../ui/button.js";
 import OyunBeklemeScene from "../game/oyunbekleme.js";
@@ -18,24 +18,22 @@ export default class LobbyScene extends Phaser.Scene {
   create() {
     const [socket, ID] = getSocketID(this);
     this.socket = socket;
-    this.socket.addListener("data", this.messageHandler);
-    this.socket.addListener("data", this.userHandler);
-    this.socket.addListener("data", this.gameHandler);
+    this.game.events.on(SERVERCHATSENT.message.type, this.messageHandler);
+    this.game.events.on(LOBBYUSER.message.type, this.userHandler);
+    this.game.events.on(LOBBYGAME.message.type, this.gameHandler);
 
     this.events.on("shutdown", () => {
-      this.socket.removeListener("data", this.messageHandler);
-      this.socket.removeListener("data", this.userHandler);
-      this.socket.removeListener("data", this.gameHandler);
+      this.game.events.off(SERVERCHATSENT.message.type, this.messageHandler);
+      this.game.events.off(LOBBYUSER.message.type, this.userHandler);
+      this.game.events.off(LOBBYGAME.message.type, this.gameHandler);
     });
-    // this.socket.addListener("data", (data) => {
-    //   console.log(data.toString());
-    // });
+
     let json = {
       ...LOBBYINIT.message,
       ID: this.registry.get("ID"),
       name: this.registry.get("name"),
     };
-    this.socket.write(JSON.stringify(json));
+    sendMessage(this.socket, json);
     const bg = this.add.image(400, 400, "bg");
     this.bg1 = this.add.image(400, 400, "bg").setOrigin(0, 0);
     let dom1 = this.add.dom(30, 400).createFromCache("chat").setOrigin(0, 0);
@@ -70,7 +68,7 @@ export default class LobbyScene extends Phaser.Scene {
         ID,
       };
       let socket = await isSocketOpen(this.registry.get("socket"));
-      socket.write(JSON.stringify(message));
+      sendMessage(socket, message);
       // this.events.emit("message", { name: "Leon", message: textarea.value });
       textarea.value = "";
     });
@@ -97,8 +95,7 @@ export default class LobbyScene extends Phaser.Scene {
   }
 
   userHandler = (data) => {
-    data = JSON.parse(data.toString());
-    if (data.type != LOBBYUSER.message.type) return;
+    // if (data.type != LOBBYUSER.message.type) return;
     if (this.usersGroup == null) {
       this.usersGroup = this.add.group();
       this.usersGroup.add(
@@ -119,8 +116,7 @@ export default class LobbyScene extends Phaser.Scene {
   };
 
   gameHandler = (data) => {
-    data = JSON.parse(data.toString());
-    if (data.type != LOBBYGAME.message.type) return;
+    // if (data.type != LOBBYGAME.message.type) return;
     if (this.gamesGroup == null) {
       this.gamesGroup = this.add.group();
       this.gamesGroup.add(
@@ -162,9 +158,7 @@ export default class LobbyScene extends Phaser.Scene {
   }
 
   messageHandler = (data) => {
-    console.log("mmmmme", data.toString());
-    data = JSON.parse(data.toString());
-    if (data.type != SERVERCHATSENT.message.type) return;
+    // if (data.type != SERVERCHATSENT.message.type) return;
 
     let ID = this.registry.get("ID");
 

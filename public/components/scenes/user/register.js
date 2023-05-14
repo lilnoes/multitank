@@ -1,6 +1,6 @@
 import { IDMESSAGE } from "../../../../server/modules/register/id.js";
 import { REGISTERUSERMESSAGE } from "../../../../server/modules/register/registeruser.js";
-import { isSocketOpen } from "../../../client/client.js";
+import { isSocketOpen, sendMessage } from "../../../client/client.js";
 import { getButton } from "../../ui/button.js";
 import LoginScene from "./login.js";
 
@@ -40,27 +40,23 @@ export default class RegisterScene extends Phaser.Scene {
 
   async sendData() {
     let socket = await isSocketOpen(this.registry.get("socket"));
-    socket.removeListener("data", this.idListener);
-    socket.addListener("data", this.idListener);
+    this.game.events.off(IDMESSAGE.message.type, this.idListener);
+    this.game.events.on(IDMESSAGE.message.type, this.idListener);
     let name = document.getElementById("name").value;
     let email = document.getElementById("email").value;
     let password = document.getElementById("password").value;
-    socket.write(
-      JSON.stringify({
-        type: REGISTERUSERMESSAGE.message.type,
-        name,
-        email,
-        password,
-      })
-    );
+    sendMessage(socket, {
+      type: REGISTERUSERMESSAGE.message.type,
+      name,
+      email,
+      password,
+    });
   }
 
   idListener = async (data) => {
-    let message = JSON.parse(data.toString());
-    if (message.type == IDMESSAGE.message.type) {
-      this.registry.set("id", message.id);
-      console.log("received id", data.toString());
-      this.scene.start(LoginScene.KEY);
-    }
+    // if (message.type != IDMESSAGE.message.type) return;
+    this.registry.set("id", message.id);
+    console.log("received id", data.toString());
+    this.scene.start(LoginScene.KEY);
   };
 }

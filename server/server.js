@@ -1,18 +1,18 @@
 import net from "net";
-import parseIncomingMessage from "./modules/index.js";
 import { CLIENTS } from "./globals.js";
+import handleIncomingEvent from "./modules/index.js";
 
 const server = net.createServer((socket) => {
   socket.on("data", async (data) => {
-    try {
-      let json = JSON.parse(data.toString());
-      console.log("json", json);
-      if (json.ID != null) CLIENTS.set(json.ID, socket);
+    const events = parseData(data);
+    for (let event of events) {
+      try {
+        if (event.ID != null) CLIENTS.set(event.ID, socket);
 
-      let res = await parseIncomingMessage(socket, data);
-      // console.log(parseIncomingMessage(ws, data));
-    } catch (e) {
-      console.log("error while parsing", data.toString(), e);
+        let res = await handleIncomingEvent(socket, event);
+      } catch (e) {
+        console.log("error handling", e, event);
+      }
     }
   });
 
@@ -22,5 +22,18 @@ const server = net.createServer((socket) => {
 
   socket.on("end", () => console.log("Connection ended"));
 });
+
+function parseData(data) {
+  const events = [];
+  for (let json of data.toString().trim().split("\r\n")) {
+    try {
+      json = JSON.parse(json);
+      events.push(json);
+    } catch (e) {
+      console.log("error parsing data", data);
+    }
+  }
+  return events;
+}
 
 server.listen(9000, () => console.log("Server listening on localhost:9000"));

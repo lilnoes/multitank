@@ -14,7 +14,7 @@ export const RENDERPROGRESS = {
 
     if (json.type == this.message.type) {
       let game = GAMES.get(json.gameid);
-      await sendToSocket(CLIENTS.get(game.creator), JSON.stringify(json));
+      await sendToSocket(CLIENTS.get(game.creator), json);
       return true;
     }
     return false;
