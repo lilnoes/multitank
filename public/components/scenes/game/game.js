@@ -1,4 +1,8 @@
+import { GAMEBULLET } from "../../../../server/modules/playing/gamebullet.js";
 import { GAMESTART } from "../../../../server/modules/playing/gamestart.js";
+import { GAMEUPDATE } from "../../../../server/modules/playing/gameupdate.js";
+import { GAMEUSERINFO } from "../../../../server/modules/playing/gameuserinfo.js";
+import { sendMessage } from "../../../client/client.js";
 import { getSocketID } from "../../../client/utils.js";
 
 export default class GameScene extends Phaser.Scene {
@@ -16,7 +20,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   handleGameStart = (data) => {
-    console.log("her");
+    this.gameid = data.gameid;
     // if (data.type != GAMESTART.message.type) return;
     for (let user of data.users) this.tanksGroup.add(this.getTank(user));
     this.scene.setVisible(true);
@@ -26,6 +30,14 @@ export default class GameScene extends Phaser.Scene {
     this.gameid = gameid;
     [this.socket, this.ID] = getSocketID(this);
     this.game.events.on(GAMESTART.message.type, this.handleGameStart);
+    this.game.events.on(GAMEUPDATE.message.type, this.handleGameUpdate);
+    this.game.events.on(GAMEBULLET.message.type, this.handleBulletUpdate);
+
+    this.events.on("shutdown", () => {
+      this.game.events.off(GAMESTART.message.type, this.handleGameUpdate);
+      this.game.events.off(GAMEBULLET.message.type, this.handleBulletUpdate);
+    });
+
     this.physics.world.setBoundsCollision();
     this.space = this.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.SPACE
@@ -39,7 +51,6 @@ export default class GameScene extends Phaser.Scene {
   }
 
   getTank(user) {
-    -Math.PI / 2;
     const tankContainer = this.add.container();
     tankContainer.setSize(50, 50);
     const tank = this.add.image(0, 0, "tank");
@@ -50,14 +61,14 @@ export default class GameScene extends Phaser.Scene {
       .rectangle(0, -50, 50, height, 0xffffff)
       .setOrigin(0, 0);
     const red = this.add
-      .rectangle(0, -50, 40, height, 0xff1010)
+      .rectangle(0, -50, 50, height, 0xff1010)
       .setOrigin(0, 0);
 
     this.physics.add.existing(tank, false);
     tank.setOrigin(0.7, 0.7);
     tank.body.setImmovable(true);
     tank.body.setSize(40, 40);
-    tank.id = user.ID;
+    tank.ID = user.ID;
 
     Phaser.Actions.AlignTo([tank, text], Phaser.Display.Align.TOP_LEFT, 1);
     Phaser.Actions.AlignTo(
@@ -72,7 +83,7 @@ export default class GameScene extends Phaser.Scene {
     );
     red.setPosition(white.x, white.y);
     tankContainer.add([tank, white, red, text, score]);
-    tankContainer.id = user.ID;
+    tankContainer.ID = user.ID;
     if (user.ID == this.ID) this.tankContainer = tankContainer;
 
     tankContainer.setPosition(user.x, user.y);
@@ -80,14 +91,22 @@ export default class GameScene extends Phaser.Scene {
 
     this.physics.add.collider(this.bullets, tank, (tank, bullet) => {
       if (tank.ID == bullet.ID) return;
-      // bullet.destroy();
       // console.log("overlap", tank.id, bullet.id);
       let red = tank.parentContainer.getAt(2);
+
+      try {
+        let score = this.tanksGroup.getMatching("ID", bullet.ID)[0].getAt(4);
+        score.text = (parseInt(score.text) + 10).toString();
+      } catch (e) {
+        console.log("error updating score", e);
+      }
+
       if (red.width <= 1) {
         tank.parentContainer.destroy();
         return;
       }
       red.setSize(red.width - 1, red.height);
+      bullet.destroy();
       // console.log("width", tank.red.width);
       // window.red = tank.red.sets;
       // tank.red.displayWidth(red.width - 3);
@@ -95,64 +114,142 @@ export default class GameScene extends Phaser.Scene {
     return tankContainer;
   }
 
+  handleGameUpdate = (data) => {
+    try {
+      let container = this.tanksGroup.getMatching("ID", data.ID)[0];
+      container.x = data.x;
+      container.y = data.y;
+      container.getAt(0).angle = data.angle;
+    } catch (e) {
+      console.log("not found", e);
+    }
+  };
+  handleBulletUpdate = (data) => {
+    try {
+      console.log("received", data);
+      this.getBullet(data.rotation, data.x, data.y, data.ID, data.vx, data.vy);
+      // container.x = data.x;
+    } catch (e) {
+      console.log("not found", e);
+    }
+  };
+
+  sendGameUserInfo(life = 100, score = 0) {
+    let message = {
+      ...GAMEUSERINFO.message,
+      ID: this.ID,
+      gameid: this.gameid,
+      life,
+      score,
+    };
+    sendMessage(this.socket, message);
+  }
+
+  sendUpdate(life = 100, score = 0) {
+    const { x, y } = this.tankContainer;
+    const angle = this.tankContainer.getAt(0).angle;
+    let message = {
+      ...GAMEUPDATE.message,
+      ID: this.ID,
+      gameid: this.gameid,
+      x,
+      y,
+      angle,
+      life,
+      score,
+    };
+    sendMessage(this.socket, message);
+  }
+
   update() {
     // Shoot the rectangle when the Z key is pressed
     if (Phaser.Input.Keyboard.JustDown(this.cursors.space)) {
-      const bullet = this.bullets
-        .get(this.tankContainer.x, this.tankContainer.y, "bullet")
-        .setRotation(Math.PI / 2 + this.rotation)
-        .setScale(0.3);
-      bullet.body.setCollideWorldBounds(true);
-      bullet.ID = this.ID;
-      bullet.body.onWorldBounds = true;
-      bullet.body.world.on("worldbounds", (_bullet) => {
-        if (_bullet.gameObject === bullet) {
-          bullet.destroy();
-          // console.log("destroyed");
-        }
-      });
+      const offset = -Math.PI / 2;
+      const rotation = this.tankContainer.getAt(0).rotation;
       const speed = 300;
-      const velocityX = Math.cos(this.rotation) * speed;
-      const velocityY = Math.sin(this.rotation) * speed;
-      bullet.setVelocityX(velocityX);
-      bullet.setVelocityY(velocityY);
+      const velocityX = Math.cos(rotation + offset) * speed;
+      const velocityY = Math.sin(rotation + offset) * speed;
+      // bullet.setVelocityX(velocityX);
+      // bullet.setVelocityY(velocityY);
+      this.getBullet(
+        rotation,
+        this.tankContainer.x,
+        this.tankContainer.y,
+        this.ID,
+        velocityX,
+        velocityY
+      );
     }
     //rotate clockwise on akey
     if (this.aKey.isDown) {
       let offset = (Math.PI * 2) / 360;
       this.rotation += offset;
-      this.tankContainer.rotation += offset;
+      this.tankContainer.getAt(0).rotation += offset;
+      this.sendUpdate();
     }
     //rotate counter clockwise on z key
     if (this.zKey.isDown) {
       let offset = (Math.PI * 2) / 360;
       this.rotation -= offset;
-      this.tankContainer.rotation -= offset;
+      this.tankContainer.getAt(0).rotation -= offset;
+      this.sendUpdate();
     }
     //Move up
     if (this.cursors.up.isDown) {
       let tank = this.tankContainer.first;
-      console.log("position", tank.y, tank.body.y);
       let offset = 1;
       this.tankContainer.y -= offset;
+      this.sendUpdate();
     }
     //move down
     if (this.cursors.down.isDown) {
       let offset = 1;
       this.tankContainer.y += offset;
+      this.sendUpdate();
     }
 
     //Move left
     if (this.cursors.left.isDown) {
       let offset = 1;
       this.tankContainer.x -= offset;
+      this.sendUpdate();
     }
     //move right
     if (this.cursors.right.isDown) {
       let tank = this.tankContainer.first;
-      console.log("position", tank.x, tank.body.x);
       let offset = 1;
       this.tankContainer.x += offset;
+      this.sendUpdate();
     }
+  }
+  getBullet(rotation, x, y, ID, vx, vy) {
+    const bullet = this.bullets
+      .get(x, y, "bullet")
+      .setRotation(rotation)
+      .setScale(0.3);
+    bullet.body.setCollideWorldBounds(true);
+    bullet.ID = ID;
+    bullet.body.onWorldBounds = true;
+    bullet.body.world.on("worldbounds", (_bullet) => {
+      if (_bullet.gameObject === bullet) {
+        bullet.destroy();
+        console.log("destroyed");
+      }
+    });
+    bullet.setVelocityX(vx);
+    bullet.setVelocityY(vy);
+    if (ID != this.ID) return bullet;
+    let message = {
+      ...GAMEBULLET.message,
+      gameid: this.gameid,
+      ID,
+      x,
+      y,
+      vx,
+      vy,
+      rotation,
+    };
+    sendMessage(this.socket, message);
+    return bullet;
   }
 }

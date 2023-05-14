@@ -8,6 +8,8 @@ import { REGISTERGAMEUSER } from "./waiting/registergameuser.js";
 import { STARTRENDER } from "./waiting/startrender.js";
 import { RENDERPROGRESS } from "./waiting/renderprogress.js";
 import { GAMEREADY } from "./playing/gameready.js";
+import { GAMEUPDATE } from "./playing/gameupdate.js";
+import { GAMEBULLET } from "./playing/gamebullet.js";
 
 const messages = [
   REGISTERUSERMESSAGE,
@@ -19,6 +21,8 @@ const messages = [
   STARTRENDER,
   RENDERPROGRESS,
   GAMEREADY,
+  GAMEUPDATE,
+  GAMEBULLET,
 ];
 
 /**
