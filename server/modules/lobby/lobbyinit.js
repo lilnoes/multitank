@@ -30,6 +30,8 @@ export const LOBBYINIT = {
         let message = {
           ...LOBBYGAME.message,
           ...game,
+          users: 1,
+          creator: 1,
         };
         for (let client of CLIENTS.values()) {
           await sendToSocket(client, JSON.stringify(message));

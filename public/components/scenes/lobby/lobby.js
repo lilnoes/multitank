@@ -4,35 +4,20 @@ import { LOBBYINIT } from "../../../../server/modules/lobby/lobbyinit.js";
 import { LOBBYUSER } from "../../../../server/modules/lobby/lobbyuser.js";
 import { SERVERCHATSENT } from "../../../../server/modules/lobby/serverchatsent.js";
 import { isSocketOpen } from "../../../client/client.js";
-import { SCENECONFIG } from "../../../client/sceneconfig.js";
+import { getSocketID } from "../../../client/utils.js";
 import { getButton } from "../../ui/button.js";
 import OyunBeklemeScene from "../game/oyunbekleme.js";
 import OyunKurScene from "../game/oyunkur.js";
 
 export default class LobbyScene extends Phaser.Scene {
-  /**
-   * @type net.Socket
-   */
-  socket;
-  constructor() {
-    super(SCENECONFIG);
-  }
   static KEY = "LobbyScene";
   preload() {
-    this.plugins.get("rexawaitloaderplugin").addToScene(this);
-    this.load.rexAwait(async (res, rej) => {
-      this.socket = await isSocketOpen(this.registry.get("socket"));
-      this.registry.set("socket", this.socket);
-
-      // this.socket.on("data", (data) => {
-      //   console.log("data", data.toString());
-      // });
-      res();
-    });
     this.load.image("bg", "assets/bg1.png");
     this.load.html("chat", "assets/html/chat.html");
   }
   create() {
+    const [socket, ID] = getSocketID(this);
+    this.socket = socket;
     this.socket.addListener("data", this.messageHandler);
     this.socket.addListener("data", this.userHandler);
     this.socket.addListener("data", this.gameHandler);

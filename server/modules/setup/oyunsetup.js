@@ -18,12 +18,14 @@ export const OYUNSETUP = {
         gameid: json.gameid,
         time: json.time,
         started: false,
+        creator: json.ID,
         users: new Map(),
       });
       for (let game of GAMES.values()) {
         let message = {
           ...LOBBYGAME.message,
           ...game,
+          creator: 1,
           users: game.users.size,
         };
         for (let client of CLIENTS.values()) {

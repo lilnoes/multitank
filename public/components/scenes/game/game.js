@@ -1,18 +1,34 @@
+import { GAMESTART } from "../../../../server/modules/playing/gamestart.js";
+import { getSocketID } from "../../../client/utils.js";
+
 export default class GameScene extends Phaser.Scene {
   static KEY = "GAMESCENE";
   preload() {
     // Preload assets (if needed)
+
     this.load.image("bg", "assets/bg.png");
     this.load.image("bullet", "assets/bullet.png");
     this.load.image("tank", "assets/tank.png");
-    this.tankGroups = this.add.group();
+    this.tanksGroup = this.add.group();
     this.bullets = this.bullets = this.physics.add.group({
       classType: Phaser.Physics.Arcade.Image,
     });
   }
 
+  handleGameStart = (data) => {
+    data = JSON.parse(data.toString());
+    if (data.type != GAMESTART.message.type) return;
+    for (let user of data.users)
+      this.tanksGroup.add(this.getTank(user.name, user.ID));
+    let shape = new Phaser.Geom.Ellipse(400, 300, 400, 400);
+    Phaser.Actions.PlaceOnEllipse(this.tanksGroup.getChildren(), shape);
+    this.scene.setVisible(true);
+  };
+
   create({ gameid }) {
-    this.rotation = -Math.PI / 2;
+    this.gameid = gameid;
+    [this.socket, this.ID] = getSocketID(this);
+    this.socket.on("data", this.handleGameStart);
     this.physics.world.setBoundsCollision();
     this.space = this.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.SPACE
@@ -20,25 +36,18 @@ export default class GameScene extends Phaser.Scene {
 
     this.aKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
     this.zKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
+
     this.cursors = this.input.keyboard.createCursorKeys();
     this.add.image(400, 400, "bg");
-    // this.tank = this.add.image(400, 400, "tank");
-    // this.tank2 = this.add.image(100, 100, "tank");
-
-    let t1 = this.getTank("Leon");
-    let t2 = this.getTank("Emma", 100, 60, "30");
-    let t3 = this.getTank("Azza", 600, 60, "80");
-    let ret = new Phaser.Geom.Rectangle(100, 60, 650, 450);
-    Phaser.Actions.RandomRectangle([t1, t2, t3], ret);
   }
 
-  getTank(name, x = 400, y = 400, id = "10") {
+  getTank(name, ID = "10") {
+    -Math.PI / 2;
     const tankContainer = this.add.container();
-    tankContainer.setSize(100, 100);
     tankContainer.setSize(50, 50);
-    let tank = this.add.image(0, 0, "tank");
+    const tank = this.add.image(0, 0, "tank");
     const text = this.add.text(-40, -50, name);
-    const width = text.width;
+    const score = this.add.text(-40, -50, "0");
     const height = text.height;
     const white = this.add
       .rectangle(0, -50, 50, height, 0xffffff)
@@ -47,32 +56,32 @@ export default class GameScene extends Phaser.Scene {
       .rectangle(0, -50, 40, height, 0xff1010)
       .setOrigin(0, 0);
 
-    tank = this.physics.add.existing(tank, false);
+    this.physics.add.existing(tank, false);
     tank.setOrigin(0.7, 0.7);
     tank.body.setImmovable(true);
-    let center = tank.getBounds();
     tank.body.setSize(40, 40);
-    tank.id = id;
-    tank.red = red;
+    tank.id = ID;
 
     Phaser.Actions.AlignTo(
       [text, white],
       Phaser.Display.Align.RIGHT_CENTER,
       10
     );
+    Phaser.Actions.AlignTo(
+      [white, score],
+      Phaser.Display.Align.RIGHT_CENTER,
+      10
+    );
     red.setPosition(white.x, white.y);
-    tankContainer.add([tank, white, red, text]);
-    tankContainer.setPosition(x, y);
-    tankContainer.id = id;
-    if (id == "10") this.tankContainer = tankContainer;
-    // console.log("pos", tank.body.position, tank.x, tank.y);
-
-    this.tankGroups.add(tankContainer);
+    tankContainer.add([tank, white, red, text, score]);
+    tankContainer.id = ID;
+    if (ID == this.ID) this.tankContainer = tankContainer;
+    // return tankContainer;
 
     this.physics.add.collider(this.bullets, tank, (tank, bullet) => {
-      if (tank.id == bullet.id) return;
+      if (tank.ID == bullet.ID) return;
       // bullet.destroy();
-      console.log("overlap", tank.id, bullet.id);
+      // console.log("overlap", tank.id, bullet.id);
       let red = tank.parentContainer.getAt(2);
       if (red.width <= 1) {
         tank.parentContainer.destroy();
@@ -94,7 +103,7 @@ export default class GameScene extends Phaser.Scene {
         .setRotation(Math.PI / 2 + this.rotation)
         .setScale(0.3);
       bullet.body.setCollideWorldBounds(true);
-      bullet.id = "10";
+      bullet.ID = this.ID;
       bullet.body.onWorldBounds = true;
       bullet.body.world.on("worldbounds", (_bullet) => {
         if (_bullet.gameObject === bullet) {

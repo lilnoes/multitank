@@ -1,7 +1,9 @@
+import { sleep } from "../../public/client/time.js";
+
 export async function sendToSocket(socket, message) {
-  return new Promise((res, rej) => {
+  return new Promise(async (res, rej) => {
+    await sleep(40);
     socket.write(message);
-    setTimeout(res, 10);
-    // res();
+    res();
   });
 }

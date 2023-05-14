@@ -5,6 +5,9 @@ import { CLIENTCHATSENT } from "./lobby/clientchatsent.js";
 import { LOBBYINIT } from "./lobby/lobbyinit.js";
 import { OYUNSETUP } from "./setup/oyunsetup.js";
 import { REGISTERGAMEUSER } from "./waiting/registergameuser.js";
+import { STARTRENDER } from "./waiting/startrender.js";
+import { RENDERPROGRESS } from "./waiting/renderprogress.js";
+import { GAMEREADY } from "./playing/gameready.js";
 
 const messages = [
   REGISTERUSERMESSAGE,
@@ -13,6 +16,9 @@ const messages = [
   LOBBYINIT,
   OYUNSETUP,
   REGISTERGAMEUSER,
+  STARTRENDER,
+  RENDERPROGRESS,
+  GAMEREADY,
 ];
 
 /**
