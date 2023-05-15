@@ -1,9 +1,11 @@
 import { GAMEBULLET } from "../../../../server/modules/playing/gamebullet.js";
+import { GAMEEND } from "../../../../server/modules/playing/gameend.js";
 import { GAMESTART } from "../../../../server/modules/playing/gamestart.js";
 import { GAMEUPDATE } from "../../../../server/modules/playing/gameupdate.js";
 import { GAMEUSERINFO } from "../../../../server/modules/playing/gameuserinfo.js";
 import { sendMessage } from "../../../client/client.js";
 import { getSocketID } from "../../../client/utils.js";
+import OyunSonuScene from "./oyunson.js";
 
 export default class GameScene extends Phaser.Scene {
   static KEY = "GAMESCENE";
@@ -32,10 +34,12 @@ export default class GameScene extends Phaser.Scene {
     this.game.events.on(GAMESTART.message.type, this.handleGameStart);
     this.game.events.on(GAMEUPDATE.message.type, this.handleGameUpdate);
     this.game.events.on(GAMEBULLET.message.type, this.handleBulletUpdate);
+    this.game.events.on(GAMEEND.message.type, this.handleGameEnd);
 
     this.events.on("shutdown", () => {
       this.game.events.off(GAMESTART.message.type, this.handleGameUpdate);
       this.game.events.off(GAMEBULLET.message.type, this.handleBulletUpdate);
+      this.game.events.off(GAMEEND.message.type, this.handleGameEnd);
     });
 
     this.physics.world.setBoundsCollision();
@@ -90,29 +94,41 @@ export default class GameScene extends Phaser.Scene {
     tankContainer.setAngle(user.angle);
 
     this.physics.add.collider(this.bullets, tank, (tank, bullet) => {
+      let newscore = "";
+      let life = 100;
       if (tank.ID == bullet.ID) return;
       // console.log("overlap", tank.id, bullet.id);
       let red = tank.parentContainer.getAt(2);
 
       try {
         let score = this.tanksGroup.getMatching("ID", bullet.ID)[0].getAt(4);
-        score.text = (parseInt(score.text) + 10).toString();
+        newscore = parseInt(score.text) + 10;
+        score.text = newscore.toString();
       } catch (e) {
         console.log("error updating score", e);
       }
 
-      if (red.width <= 1) {
+      if (red.width < 1) {
         tank.parentContainer.destroy();
         return;
       }
-      red.setSize(red.width - 1, red.height);
+      life = red.width - 1;
+      red.setSize(life, red.height);
       bullet.destroy();
+
+      if (tank.ID == this.ID || bullet.ID == this.ID) this.sendGameUserInfo();
+
       // console.log("width", tank.red.width);
       // window.red = tank.red.sets;
       // tank.red.displayWidth(red.width - 3);
     });
     return tankContainer;
   }
+
+  handleGameEnd = (data) => {
+    console.log("game ended", data);
+    this.scene.start(OyunSonuScene.KEY, data);
+  };
 
   handleGameUpdate = (data) => {
     try {
@@ -124,9 +140,10 @@ export default class GameScene extends Phaser.Scene {
       console.log("not found", e);
     }
   };
+
   handleBulletUpdate = (data) => {
     try {
-      console.log("received", data);
+      // console.log("received", data);
       this.getBullet(data.rotation, data.x, data.y, data.ID, data.vx, data.vy);
       // container.x = data.x;
     } catch (e) {
@@ -134,13 +151,17 @@ export default class GameScene extends Phaser.Scene {
     }
   };
 
-  sendGameUserInfo(life = 100, score = 0) {
+  sendGameUserInfo() {
+    const name = this.registry.get("name");
+    let red = this.tankContainer.getAt(2);
+    let score = this.tankContainer.getAt(4);
     let message = {
       ...GAMEUSERINFO.message,
       ID: this.ID,
       gameid: this.gameid,
-      life,
-      score,
+      life: (red.width / 50) * 100,
+      score: parseInt(score.text),
+      name,
     };
     sendMessage(this.socket, message);
   }

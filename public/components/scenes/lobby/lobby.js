@@ -6,6 +6,7 @@ import { SERVERCHATSENT } from "../../../../server/modules/lobby/serverchatsent.
 import { isSocketOpen, sendMessage } from "../../../client/client.js";
 import { getSocketID } from "../../../client/utils.js";
 import { getButton } from "../../ui/button.js";
+import LiderTablosuScene from "../game/lidertablosu.js";
 import OyunBeklemeScene from "../game/oyunbekleme.js";
 import OyunKurScene from "../game/oyunkur.js";
 
@@ -16,6 +17,7 @@ export default class LobbyScene extends Phaser.Scene {
     this.load.html("chat", "assets/html/chat.html");
   }
   create() {
+    console.log("create");
     const [socket, ID] = getSocketID(this);
     this.socket = socket;
     this.game.events.on(SERVERCHATSENT.message.type, this.messageHandler);
@@ -84,6 +86,9 @@ export default class LobbyScene extends Phaser.Scene {
     getButton(this, "Yeni oyun", () => {
       this.scene.start(OyunKurScene.KEY);
     }).setPosition(500, 300);
+    getButton(this, "Lider Tablosu", () => {
+      this.scene.switch(LiderTablosuScene.KEY);
+    }).setPosition(150, 300);
 
     this.cameras.main.setSize(1, 1);
     this.cursors = this.input.keyboard.createCursorKeys();
@@ -102,6 +107,7 @@ export default class LobbyScene extends Phaser.Scene {
         getButton(this, "Oyuncu Listesi", () => {}).setPosition(150, 60)
       );
     }
+    window.group = this.usersGroup;
 
     let text = this.add.text(0, 0, data.name);
     let children = this.usersGroup.getChildren();

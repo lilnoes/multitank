@@ -10,6 +10,7 @@ import { RENDERPROGRESS } from "./waiting/renderprogress.js";
 import { GAMEREADY } from "./playing/gameready.js";
 import { GAMEUPDATE } from "./playing/gameupdate.js";
 import { GAMEBULLET } from "./playing/gamebullet.js";
+import { GAMEUSERINFO } from "./playing/gameuserinfo.js";
 
 const messages = [
   REGISTERUSERMESSAGE,
@@ -23,6 +24,7 @@ const messages = [
   GAMEREADY,
   GAMEUPDATE,
   GAMEBULLET,
+  GAMEUSERINFO,
 ];
 
 /**
