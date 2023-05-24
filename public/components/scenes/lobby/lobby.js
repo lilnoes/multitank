@@ -1,8 +1,6 @@
-import { CLIENTCHATSENT } from "../../../../server/modules/lobby/clientchatsent.js";
+import { CLIENTCHAT } from "../../../../server/modules/lobby/clientchat.js";
 import { LOBBYGAME } from "../../../../server/modules/lobby/lobbygame.js";
-import { LOBBYINIT } from "../../../../server/modules/lobby/lobbyinit.js";
 import { LOBBYUSER } from "../../../../server/modules/lobby/lobbyuser.js";
-import { SERVERCHATSENT } from "../../../../server/modules/lobby/serverchatsent.js";
 import { isSocketOpen, sendMessage } from "../../../client/client.js";
 import { getSocketID } from "../../../client/utils.js";
 import { getButton } from "../../ui/button.js";
@@ -20,12 +18,12 @@ export default class LobbyScene extends Phaser.Scene {
     console.log("create");
     const [socket, ID] = getSocketID(this);
     this.socket = socket;
-    this.game.events.on(SERVERCHATSENT.message.type, this.messageHandler);
+    this.game.events.on(CLIENTCHAT.message.type, this.messageHandler);
     this.game.events.on(LOBBYUSER.message.type, this.userHandler);
     this.game.events.on(LOBBYGAME.message.type, this.gameHandler);
 
     this.events.on("shutdown", () => {
-      this.game.events.off(SERVERCHATSENT.message.type, this.messageHandler);
+      this.game.events.off(CLIENTCHAT.message.type, this.messageHandler);
       this.game.events.off(LOBBYUSER.message.type, this.userHandler);
       this.game.events.off(LOBBYGAME.message.type, this.gameHandler);
     });
@@ -64,7 +62,7 @@ export default class LobbyScene extends Phaser.Scene {
       let ID = this.registry.get("ID");
       if (textarea.value <= 0) return;
       let message = {
-        ...CLIENTCHATSENT.message,
+        ...CLIENTCHAT.message,
         name: this.registry.get("name"),
         message: textarea.value,
         ID,

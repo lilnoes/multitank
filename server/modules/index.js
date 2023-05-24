@@ -1,8 +1,7 @@
 import { UNKNOWNMESSAGE } from "./unknown.js";
 import { REGISTERUSERMESSAGE } from "./register/registeruser.js";
 import { LOGINMESSAGE } from "./login/login.js";
-import { CLIENTCHATSENT } from "./lobby/clientchatsent.js";
-import { LOBBYINIT } from "./lobby/lobbyinit.js";
+import { CLIENTCHAT } from "./lobby/clientchat.js";
 import { OYUNSETUP } from "./setup/oyunsetup.js";
 import { REGISTERGAMEUSER } from "./waiting/registergameuser.js";
 import { STARTRENDER } from "./waiting/startrender.js";
@@ -16,7 +15,7 @@ import { LOBBYUSER } from "./lobby/lobbyuser.js";
 const messages = [
   REGISTERUSERMESSAGE,
   LOGINMESSAGE,
-  CLIENTCHATSENT,
+  CLIENTCHAT,
   LOBBYUSER,
   OYUNSETUP,
   REGISTERGAMEUSER,

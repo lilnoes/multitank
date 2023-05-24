@@ -1,8 +1,8 @@
 import { CLIENTS } from "../../globals.js";
 import { SERVERCHATSENT } from "./serverchatsent.js";
 
-export const CLIENTCHATSENT = {
-  message: { type: "CLIENTCHATSENT", name: "", message: "", ID: "" },
+export const CLIENTCHAT = {
+  message: { type: "CLIENTCHAT", name: "", message: "", ID: "" },
   /**
    *
    * @param {String} json
@@ -10,13 +10,14 @@ export const CLIENTCHATSENT = {
    * @returns
    */
   handle: async function (json, socket) {
+    const { sendToSocket } = await import("../../utils/socket.js");
     if (
       json.type == this.message.type &&
       json.name != null &&
       json.message != null
     ) {
       let message = {
-        ...SERVERCHATSENT.message,
+        ...this.message,
         name: json.name,
         message: json.message,
         ID: json.ID,
@@ -24,8 +25,10 @@ export const CLIENTCHATSENT = {
       // socket.
       for (let client of CLIENTS.values()) {
         // console.log("client", client.closed);
-        console.log(client.remoteAddress);
-        client.write(JSON.stringify(message));
+        // console.log(client.remoteAddress);
+
+        // client.write(JSON.stringify(message));
+        await sendToSocket(client, message);
       }
       return true;
     }
