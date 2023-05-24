@@ -15,7 +15,7 @@ export async function saveUser(name, email, password) {
   const collection = db.collection("users");
 
   const user = await collection.insertOne({ name, email, password });
-  return user.insertedId.toString();
+  return { id: user.insertedId.toString(), name };
 }
 
 export async function loginUser(email, password) {
@@ -23,5 +23,5 @@ export async function loginUser(email, password) {
   const collection = db.collection("users");
 
   const user = await collection.findOne({ email, password });
-  return user._id.toString();
+  return { id: user._id.toString(), name: user.name };
 }

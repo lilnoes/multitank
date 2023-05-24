@@ -42,14 +42,3 @@ export const LOBBYINIT = {
     return false;
   },
 };
-/**
- *
- * @param {String} email
- * @param {String} password
- */
-async function loginUser(email, password) {
-  const { loginUser } = await import("../../utils/db.js");
-  let id = await loginUser(email, password);
-  // console.log("logged in", id);
-  return id;
-}

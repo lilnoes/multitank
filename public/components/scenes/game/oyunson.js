@@ -14,7 +14,7 @@ export default class OyunSonuScene extends Phaser.Scene {
     this.group = this.add.group();
     getButton(this, "Geri", () => {
       this.scene.start(LobbyScene.KEY);
-    });
+    }).setPosition(60, 60);
     // registerButton.setPosition(400, 500);
     this.addToGroup("Name", "Score");
     for (let user of stats ?? []) this.addToGroup(user.name, user.score);

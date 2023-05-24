@@ -60,7 +60,6 @@ export default class OyunBeklemeScene extends Phaser.Scene {
         gameid: this.gameid,
         progress: val,
       };
-      let ms = Math.random() * 500;
       sendMessage(this.socket, message);
     });
     this.scene.get(GameScene.KEY).events.once("start", () => {

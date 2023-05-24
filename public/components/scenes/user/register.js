@@ -2,6 +2,7 @@ import { IDMESSAGE } from "../../../../server/modules/register/id.js";
 import { REGISTERUSERMESSAGE } from "../../../../server/modules/register/registeruser.js";
 import { isSocketOpen, sendMessage } from "../../../client/client.js";
 import { getButton } from "../../ui/button.js";
+import LobbyScene from "../lobby/lobby.js";
 import LoginScene from "./login.js";
 
 export default class RegisterScene extends Phaser.Scene {
@@ -13,6 +14,7 @@ export default class RegisterScene extends Phaser.Scene {
   }
   create() {
     this.add.image(400, 400, "bg");
+    this.game.events.on(IDMESSAGE.message.type, this.idListener);
     let dom1 = this.add.dom(400, 300).createFromCache("register");
     let registerButton = getButton(this, "Register", async () => {
       await this.sendData();
@@ -39,9 +41,9 @@ export default class RegisterScene extends Phaser.Scene {
   }
 
   async sendData() {
+    // sendMessage()
     let socket = await isSocketOpen(this.registry.get("socket"));
-    this.game.events.off(IDMESSAGE.message.type, this.idListener);
-    this.game.events.on(IDMESSAGE.message.type, this.idListener);
+    // this.game.events.off(IDMESSAGE.message.type, this.idListener);
     let name = document.getElementById("name").value;
     let email = document.getElementById("email").value;
     let password = document.getElementById("password").value;
@@ -55,8 +57,9 @@ export default class RegisterScene extends Phaser.Scene {
 
   idListener = async (data) => {
     // if (message.type != IDMESSAGE.message.type) return;
-    this.registry.set("id", message.id);
-    console.log("received id", data.toString());
-    this.scene.start(LoginScene.KEY);
+    this.registry.set("ID", data.id);
+    this.registry.set("name", data.name);
+    // console.log("received id", data.toString());
+    this.scene.start(LobbyScene.KEY);
   };
 }

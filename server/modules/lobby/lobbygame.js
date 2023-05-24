@@ -9,7 +9,7 @@ export const LOBBYGAME = {
     name: "",
     gameid: "",
     started: false,
-    time: 0,
+    speed: 0,
   },
   /**
    *

@@ -15,8 +15,8 @@ export const LOGINMESSAGE = {
       json.email != null &&
       json.password != null
     ) {
-      let id = await loginUser(json.email, json.password);
-      let message = { ...IDMESSAGE.message, id };
+      let { id, name } = await loginUser(json.email, json.password);
+      let message = { ...IDMESSAGE.message, id, name };
       await sendToSocket(socket, message);
     }
     return false;
@@ -29,7 +29,7 @@ export const LOGINMESSAGE = {
  */
 async function loginUser(email, password) {
   const { loginUser } = await import("../../utils/db.js");
-  let id = await loginUser(email, password);
-  console.log("logged in", id);
-  return id;
+  let user = await loginUser(email, password);
+  // console.log("logged in", id);
+  return { id: user.id, name: user.name };
 }

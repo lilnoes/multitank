@@ -15,8 +15,12 @@ export const REGISTERUSERMESSAGE = {
       json.name != null &&
       json.password != null
     ) {
-      let id = await registerUser(json.name, json.email, json.password);
-      let message = { ...IDMESSAGE.message, id };
+      let { id, name } = await registerUser(
+        json.name,
+        json.email,
+        json.password
+      );
+      let message = { ...IDMESSAGE.message, id, name };
       await sendToSocket(socket, message);
     }
     return false;
@@ -30,7 +34,7 @@ export const REGISTERUSERMESSAGE = {
  */
 async function registerUser(name, email, password) {
   const { saveUser } = await import("../../utils/db.js");
-  let id = await saveUser(name, email, password);
-  console.log("saved", id);
-  return id;
+  let user = await saveUser(name, email, password);
+  // console.log("saved", id);
+  return { id: user.id, name: user.name };
 }

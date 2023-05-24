@@ -2,7 +2,7 @@ import { CLIENTS, GAMES, USERS } from "../../globals.js";
 import { LOBBYGAME } from "../lobby/lobbygame.js";
 
 export const OYUNSETUP = {
-  message: { type: "OYUNSETUP", ID: "", name: "", time: 0, gameid: "" },
+  message: { type: "OYUNSETUP", ID: "", name: "", speed: 0, gameid: "" },
   /**
    *
    * @param {String} json
@@ -16,7 +16,7 @@ export const OYUNSETUP = {
       GAMES.set(json.gameid, {
         name: json.name,
         gameid: json.gameid,
-        time: json.time,
+        speed: json.speed,
         started: false,
         creator: json.ID,
         users: new Map(),

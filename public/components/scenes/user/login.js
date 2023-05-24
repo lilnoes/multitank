@@ -12,6 +12,7 @@ export default class LoginScene extends Phaser.Scene {
     this.load.html("login", "assets/html/login.html");
   }
   create() {
+    this.game.events.on(IDMESSAGE.message.type, this.idListener);
     this.add.image(400, 400, "bg");
     let dom1 = this.add.dom(400, 300).createFromCache("login");
     let registerButton = getButton(this, "Register", () => {
@@ -39,8 +40,7 @@ export default class LoginScene extends Phaser.Scene {
   }
   async sendData() {
     let socket = await isSocketOpen(this.registry.get("socket"));
-    this.game.events.off(IDMESSAGE.message.type, this.idListener);
-    this.game.events.on(IDMESSAGE.message.type, this.idListener);
+    // this.game.events.off(IDMESSAGE.message.type, this.idListener);
     let email = document.getElementById("email").value;
     let password = document.getElementById("password").value;
     sendMessage(socket, {
@@ -52,8 +52,9 @@ export default class LoginScene extends Phaser.Scene {
 
   idListener = async (data) => {
     // if (message.type != IDMESSAGE.message.type) return;
-    this.registry.set("id", message.id);
-    console.log("received id", data.toString());
+    this.registry.set("ID", data.id);
+    this.registry.set("name", data.name);
+    // console.log("received id", data.toString());
     this.scene.start(LobbyScene.KEY);
   };
 }

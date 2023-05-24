@@ -31,17 +31,17 @@ const config = {
 
 // Create a new Phaser game instance
 const game = new Phaser.Game(config);
-game.registry.set("ID", Math.random().toString());
-game.registry.set("name", "Leon" + Math.random().toString().substring(0, 4));
+// game.registry.set("ID", Math.random().toString());
+// game.registry.set("name", "Leon" + Math.random().toString().substring(0, 4));
 
 (async () => {
   game.scene.add(InitScene.KEY, InitScene, true);
   //sleep for 1 sec to wait for socket load
-  await sleep(1000);
+  // await sleep(1000);
   game.scene.add(RegisterScene.KEY, RegisterScene, false);
   game.scene.add(LoginScene.KEY, LoginScene, false);
-  game.scene.add(MainMenu.KEY, MainMenu, false);
-  game.scene.add(LobbyScene.KEY, LobbyScene, true);
+  game.scene.add(MainMenu.KEY, MainMenu, true);
+  game.scene.add(LobbyScene.KEY, LobbyScene, false);
   game.scene.add(OyunKurScene.KEY, OyunKurScene, false);
   game.scene.add(OyunBeklemeScene.KEY, OyunBeklemeScene, false);
   game.scene.add(OyunSonuScene.KEY, OyunSonuScene, false);

@@ -31,7 +31,7 @@ export default class LobbyScene extends Phaser.Scene {
     });
 
     let json = {
-      ...LOBBYINIT.message,
+      ...LOBBYUSER.message,
       ID: this.registry.get("ID"),
       name: this.registry.get("name"),
     };
@@ -101,6 +101,7 @@ export default class LobbyScene extends Phaser.Scene {
 
   userHandler = (data) => {
     // if (data.type != LOBBYUSER.message.type) return;
+    if (this.users.has(data.name)) return;
     if (this.usersGroup == null) {
       this.usersGroup = this.add.group();
       this.usersGroup.add(
@@ -112,6 +113,7 @@ export default class LobbyScene extends Phaser.Scene {
     let text = this.add.text(0, 0, data.name);
     let children = this.usersGroup.getChildren();
     let last = children[children.length - 1];
+    this.users.add(data.name);
     this.usersGroup.add(text);
     Phaser.Actions.AlignTo(
       [last, text],

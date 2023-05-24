@@ -23,6 +23,7 @@ export default class GameScene extends Phaser.Scene {
 
   handleGameStart = (data) => {
     this.gameid = data.gameid;
+    this.speed = data.speed;
     // if (data.type != GAMESTART.message.type) return;
     for (let user of data.users) this.tanksGroup.add(this.getTank(user));
     this.scene.setVisible(true);
@@ -187,7 +188,7 @@ export default class GameScene extends Phaser.Scene {
     if (Phaser.Input.Keyboard.JustDown(this.cursors.space)) {
       const offset = -Math.PI / 2;
       const rotation = this.tankContainer.getAt(0).rotation;
-      const speed = 300;
+      const speed = this.speed;
       const velocityX = Math.cos(rotation + offset) * speed;
       const velocityY = Math.sin(rotation + offset) * speed;
       // bullet.setVelocityX(velocityX);

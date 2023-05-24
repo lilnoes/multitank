@@ -1,5 +1,5 @@
 export const IDMESSAGE = {
-  message: { type: "ID", id: "" },
+  message: { type: "IDMESSAGE", id: "", name: ""},
   /**
    *
    * @param {String} json

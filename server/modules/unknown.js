@@ -1,9 +1,7 @@
 export const UNKNOWNMESSAGE = {
-  type: "UNKNOWN",
-  name: "",
-  password: "",
+  type: "UNKNOWNMESSAGE",
   verify: function (json) {
-    if (json.type == this.type && json.name != null && json.password != null)
+    if (json.type == this.type)
       return true;
     return false;
   },

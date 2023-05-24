@@ -11,12 +11,13 @@ import { GAMEREADY } from "./playing/gameready.js";
 import { GAMEUPDATE } from "./playing/gameupdate.js";
 import { GAMEBULLET } from "./playing/gamebullet.js";
 import { GAMEUSERINFO } from "./playing/gameuserinfo.js";
+import { LOBBYUSER } from "./lobby/lobbyuser.js";
 
 const messages = [
   REGISTERUSERMESSAGE,
   LOGINMESSAGE,
   CLIENTCHATSENT,
-  LOBBYINIT,
+  LOBBYUSER,
   OYUNSETUP,
   REGISTERGAMEUSER,
   STARTRENDER,

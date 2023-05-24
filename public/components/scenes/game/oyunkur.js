@@ -16,12 +16,12 @@ export default class OyunKurScene extends Phaser.Scene {
     let registerButton = getButton(this, "Save", () => {
       let socket = this.registry.get("socket");
       let name = document.getElementById("name").value;
-      let time = document.getElementById("charge").value;
-      if (name == null || time == null) return;
-      time = parseInt(time);
+      let speed = document.getElementById("charge").value;
+      if (name == null || speed == null) return;
+      speed = parseInt(speed);
       let ID = this.registry.get("ID");
       let gameid = getUUID();
-      let message = { ...OYUNSETUP.message, ID, gameid, name, time };
+      let message = { ...OYUNSETUP.message, ID, gameid, name, speed };
       sendMessage(socket, message);
       this.scene.start(OyunBeklemeScene.KEY, { gameid, owner: true });
     });

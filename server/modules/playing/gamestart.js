@@ -6,7 +6,7 @@ export const GAMESTART = {
     type: "GAMESTART",
     ID: "",
     gameid: "",
-    time: 0,
+    speed: 0,
     users: [{ name: "", ID: "", x: 1, y: 1, angle: 0 }],
   },
   /**

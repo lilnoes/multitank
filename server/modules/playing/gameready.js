@@ -20,7 +20,7 @@ export const GAMEREADY = {
       let message = {
         ...GAMESTART.message,
         gameid: json.gameid,
-        time: game.time,
+        speed: game.speed,
         users: Array.from(game.users).map(([key, u]) => ({
           name: u.name,
           ID: u.ID,
