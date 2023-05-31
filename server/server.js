@@ -4,6 +4,8 @@ import handleIncomingEvent from "./modules/index.js";
 
 const server = net.createServer((socket) => {
   socket.on("data", async (data) => {
+    // console.log("data came", data.toString());
+    // socket.write("I got it");
     const events = parseData(data);
     for (let event of events) {
       try {

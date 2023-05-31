@@ -1,6 +1,7 @@
 import { LOGINMESSAGE } from "../../../../server/modules/login/login.js";
 import { IDMESSAGE } from "../../../../server/modules/register/id.js";
 import { isSocketOpen, sendMessage } from "../../../client/client.js";
+import { getSocketID } from "../../../client/utils.js";
 import { getButton } from "../../ui/button.js";
 import LobbyScene from "../lobby/lobby.js";
 import RegisterScene from "./register.js";
@@ -21,12 +22,22 @@ export default class LoginScene extends Phaser.Scene {
     let loginButton = getButton(this, "Login", async () => {
       await this.sendData();
     });
+    const hostButton = getButton(this, "Save Host", async () => {
+      let host = document.getElementById("host").value;
+      const socket = await isSocketOpen(null, this.game, host);
+      if (socket == null) return;
+      hostButton.setVisible(false);
+      const elt = document.getElementById("hostdiv");
+      elt.style.display = "none";
+      this.registry.set("socket", socket);
+      console.log(host);
+    });
 
     let buttonContainer = this.add.container(200, 100).setSize(200, 100);
-    buttonContainer.add([loginButton, registerButton]);
+    buttonContainer.add([loginButton, registerButton, hostButton]);
 
     Phaser.Actions.AlignTo(
-      [loginButton, registerButton],
+      [loginButton, registerButton, hostButton],
       Phaser.Display.Align.RIGHT_CENTER,
       10
     );

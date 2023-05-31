@@ -35,7 +35,7 @@ const game = new Phaser.Game(config);
 // game.registry.set("name", "Leon" + Math.random().toString().substring(0, 4));
 
 (async () => {
-  game.scene.add(InitScene.KEY, InitScene, true);
+  // game.scene.add(InitScene.KEY, InitScene, true);
   //sleep for 1 sec to wait for socket load
   // await sleep(1000);
   game.scene.add(RegisterScene.KEY, RegisterScene, false);
