@@ -1,7 +1,3 @@
-import { CLIENTS, GAMES, USERS } from "../../globals.js";
-import { LOBBYINIT } from "./lobbyinit.js";
-import { SERVERCHATSENT } from "./serverchatsent.js";
-
 export const LOBBYGAME = {
   message: {
     type: "LOBBYGAME",
@@ -14,13 +10,8 @@ export const LOBBYGAME = {
   /**
    *
    * @param {String} json
-   * @param {net.Socket} socket
+   * @param {import("socket.io").Socket} socket
    * @returns
    */
-  handle: async function (json, socket) {
-    if (json.type == this.message.type) {
-      return true;
-    }
-    return false;
-  },
+  handle: async function (json, socket) {},
 };

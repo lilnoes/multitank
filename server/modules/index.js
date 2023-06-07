@@ -11,6 +11,7 @@ import { GAMEUPDATE } from "./playing/gameupdate.js";
 import { GAMEBULLET } from "./playing/gamebullet.js";
 import { GAMEUSERINFO } from "./playing/gameuserinfo.js";
 import { LOBBYUSER } from "./lobby/lobbyuser.js";
+import { Socket } from "socket.io";
 
 const messages = [
   REGISTERUSERMESSAGE,
@@ -29,11 +30,14 @@ const messages = [
 
 /**
  *
- * @param {net.Socket} socket
- * @param {Buffer} event
+ * @param {Socket} socket
  */
-export default async function handleIncomingEvent(socket, event) {
+export default async function registerEvents(socket) {
   for (let message of messages)
-    if (await message.handle(event, socket)) return null;
-  return UNKNOWNMESSAGE;
+    socket.on(message.message.type, (data) => message.handle(json, socket));
 }
+// export default async function handleIncomingEvent(socket, event) {
+//   for (let message of messages)
+//     if (await message.handle(event, socket)) return null;
+//   return UNKNOWNMESSAGE;
+// }

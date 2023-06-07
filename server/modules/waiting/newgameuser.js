@@ -6,7 +6,7 @@ export const NEWGAMEUSER = {
   /**
    *
    * @param {String} json
-   * @param {net.Socket} socket
+   * @param {import("socket.io").Socket} socket
    * @returns
    */
   handle: async function (json, socket) {
