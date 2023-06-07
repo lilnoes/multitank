@@ -34,7 +34,9 @@ const messages = [
  */
 export default async function registerEvents(socket) {
   for (let message of messages)
-    socket.on(message.message.type, (data) => message.handle(json, socket));
+    socket.on(message.message.type, (json, callback) =>
+      message.handle(json, socket, callback)
+    );
 }
 // export default async function handleIncomingEvent(socket, event) {
 //   for (let message of messages)
