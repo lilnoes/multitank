@@ -13,6 +13,7 @@ export default class LoginScene extends Phaser.Scene {
     this.load.html("login", "assets/html/login.html");
   }
   create() {
+    [this.socket, this.ID] = getSocketID(this);
     this.game.events.on(IDMESSAGE.message.type, this.idListener);
     this.add.image(400, 400, "bg");
     let dom1 = this.add.dom(400, 300).createFromCache("login");

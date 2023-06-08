@@ -9,9 +9,7 @@ export default class InitScene extends Phaser.Scene {
   preload() {
     this.plugins.get("rexawaitloaderplugin").addToScene(this);
     this.load.rexAwait(async (res, rej) => {
-      this.socket = await isSocketOpen(this.registry.get("socket"), this.game);
-      this.registry.set("socket", this.socket);
-
+      await isSocketOpen(null, this);
       res();
     });
   }

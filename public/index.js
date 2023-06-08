@@ -38,6 +38,7 @@ const game = new Phaser.Game(config);
   // game.scene.add(InitScene.KEY, InitScene, true);
   //sleep for 1 sec to wait for socket load
   // await sleep(1000);
+  game.scene.add(InitScene.KEY, InitScene, true);
   game.scene.add(RegisterScene.KEY, RegisterScene, false);
   game.scene.add(LoginScene.KEY, LoginScene, false);
   game.scene.add(MainMenu.KEY, MainMenu, true);
