@@ -1,8 +1,7 @@
 import { CLIENTS, GAMES, USERS } from "../../globals.js";
-import { LOBBYGAME } from "../lobby/lobbygame.js";
 import { GAMEEND } from "./gameend.js";
-import { GAMESTART } from "./gamestart.js";
 
+let lastSent = new Date();
 export const GAMEUSERINFO = {
   message: {
     type: "GAMEUSERINFO",
@@ -19,21 +18,23 @@ export const GAMEUSERINFO = {
    * @returns
    */
   handle: async function (json, socket) {
-    const { sendToSocket } = await import("../../utils/socket.js");
+    checkEnd(json, socket).then(null);
+    let now = new Date();
 
-    if (json.type == this.message.type) {
-      checkEnd(json).then(null);
-      for (let client of CLIENTS.values()) {
-        await sendToSocket(client, json);
-      }
-      return true;
+    //every 15 seconds send to all users
+    if (now - lastSent > 15000) {
+      socket.broadcast.emit(json.type, json);
+      socket.emit(json.type, json);
+      lastSent = now;
+    } else {
+      //send only to the game's users
+      socket.to(json.gameid).emit(json.type, json);
+      socket.emit(json.type, json);
     }
-    return false;
   },
 };
 
-async function checkEnd(json) {
-  const { sendToSocket } = await import("../../utils/socket.js");
+async function checkEnd(json, socket) {
   let game = GAMES.get(json.gameid);
   let user = game.users.get(json.ID);
   user.life = parseFloat(json.life);
@@ -52,7 +53,6 @@ async function checkEnd(json) {
 
   let message = { ...GAMEEND.message, gameid: json.gameid, stats };
 
-  for (let user of GAMES.get(json.gameid).users.values()) {
-    await sendToSocket(CLIENTS.get(user.ID), message);
-  }
+  socket.to(json.gameid).emit(message.type, message);
+  socket.emit(message.type, message);
 }

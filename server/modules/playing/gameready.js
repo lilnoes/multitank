@@ -1,5 +1,4 @@
 import { CLIENTS, GAMES, USERS } from "../../globals.js";
-import { LOBBYGAME } from "../lobby/lobbygame.js";
 import { GAMESTART } from "./gamestart.js";
 
 export const GAMEREADY = {
@@ -11,30 +10,24 @@ export const GAMEREADY = {
    * @returns
    */
   handle: async function (json, socket) {
-    const { sendToSocket } = await import("../../utils/socket.js");
+    let game = GAMES.get(json.gameid);
+    let positions = await getPositions(game.users.size);
+    let index = 0;
+    let message = {
+      ...GAMESTART.message,
+      gameid: json.gameid,
+      speed: game.speed,
+      users: Array.from(game.users).map(([key, u]) => ({
+        name: u.name,
+        ID: u.ID,
+        x: positions[index++].x,
+        y: positions[index++].y,
+        angle: 0,
+      })),
+    };
 
-    if (json.type == this.message.type) {
-      let game = GAMES.get(json.gameid);
-      let positions = await getPositions(game.users.size);
-      let index = 0;
-      let message = {
-        ...GAMESTART.message,
-        gameid: json.gameid,
-        speed: game.speed,
-        users: Array.from(game.users).map(([key, u]) => ({
-          name: u.name,
-          ID: u.ID,
-          x: positions[index++].x,
-          y: positions[index++].y,
-          angle: 0,
-        })),
-      };
-      for (let user of game.users.values()) {
-        await sendToSocket(CLIENTS.get(user.ID), message);
-      }
-      return true;
-    }
-    return false;
+    socket.to(json.gameid).emit(message.type, message);
+    socket.emit(message.type, message);
   },
 };
 

@@ -1,6 +1,8 @@
 import { io } from "socket.io-client";
 
 const socket = io("http://localhost:9000");
+// socket.join("game");
+// socket.em
 socket.emit("data", 1, 1, (val) => {
   console.log("returned", val, test("a"));
 });
