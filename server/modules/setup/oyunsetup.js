@@ -10,31 +10,28 @@ export const OYUNSETUP = {
    * @returns
    */
   handle: async function (json, socket) {
-    const { sendToSocket } = await import("../../utils/socket.js");
+    GAMES.set(json.gameid, {
+      name: json.name,
+      gameid: json.gameid,
+      speed: json.speed,
+      started: false,
+      creator: json.ID,
+      users: new Map(),
+    });
 
-    if (json.type == this.message.type) {
-      GAMES.set(json.gameid, {
-        name: json.name,
-        gameid: json.gameid,
-        speed: json.speed,
-        started: false,
-        creator: json.ID,
-        users: new Map(),
-      });
-      for (let game of GAMES.values()) {
-        let message = {
-          ...LOBBYGAME.message,
-          ...game,
-          creator: 1,
-          users: game.users.size,
-        };
-        for (let client of CLIENTS.values()) {
-          await sendToSocket(client, message);
-        }
-      }
-      return true;
+    //join the room
+    socket.join(json.gameid);
+
+    for (let game of GAMES.values()) {
+      let message = {
+        ...LOBBYGAME.message,
+        ...game,
+        creator: 1,
+        users: game.users.size,
+      };
+      //send to all clients
+      socket.broadcast.emit(message.type, message);
     }
-    return false;
   },
 };
 /**

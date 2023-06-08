@@ -11,33 +11,30 @@ export const REGISTERGAMEUSER = {
    * @returns
    */
   handle: async function (json, socket) {
-    const { sendToSocket } = await import("../../utils/socket.js");
+    const user = {
+      ID: json.ID,
+      name: json.name,
+      x: 0,
+      y: 0,
+      angle: 0,
+      score: 0,
+      life: 100,
+    };
 
-    if (json.type == this.message.type) {
-      const user = {
-        ID: json.ID,
-        name: json.name,
-        x: 0,
-        y: 0,
-        angle: 0,
-        score: 0,
-        life: 100,
+    socket.join(json.gameid);
+
+    const game = GAMES.get(json.gameid);
+    game.users.set(json.ID, user);
+    GAMES.set(json.gameid, game);
+    for (let user of GAMES.get(json.gameid).users.values()) {
+      let message = {
+        ...NEWGAMEUSER.message,
+        gameid: json.gameid,
+        name: user.name,
       };
-      const game = GAMES.get(json.gameid);
-      game.users.set(json.ID, user);
-      GAMES.set(json.gameid, game);
-      for (let user of GAMES.get(json.gameid).users.values()) {
-        let message = {
-          ...NEWGAMEUSER.message,
-          gameid: json.gameid,
-          name: user.name,
-        };
-        for (let user of GAMES.get(json.gameid).users.values())
-          await sendToSocket(CLIENTS.get(user.ID), message);
-      }
-      return true;
+
+      socket.to(json.gameid).emit(message.type, message);
     }
-    return false;
   },
 };
 /**
