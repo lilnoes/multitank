@@ -1,4 +1,3 @@
-import { io } from "socket.io-client";
 /**
  *
  * @param {import("socket.io-client").Socket} socket
@@ -20,6 +19,10 @@ export async function isSocketOpen(socket, scene = null, _host = null) {
         scene?.registry?.set("socket", socket);
         scene?.registry?.set("ID", socket.id);
         console.log("connected id", socket.id);
+        socket.onAny((event, json) => {
+          scene.game.events.emit(event.type, json);
+          console.log("event", event, json);
+        });
         res(socket);
       });
     } catch (e) {

@@ -1,5 +1,5 @@
-import { v4 } from "uuid";
+// import { v4 } from "uuid";
 
 export function getUUID() {
-  return v4();
+  return uuidv4();
 }

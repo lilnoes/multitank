@@ -13,8 +13,8 @@ export default class LoginScene extends Phaser.Scene {
     this.load.html("login", "assets/html/login.html");
   }
   create() {
-    [this.socket, this.ID] = getSocketID(this);
-    this.game.events.on(IDMESSAGE.message.type, this.idListener);
+    // [this.socket, this.ID] = getSocketID(this);
+    // this.game.events.on(IDMESSAGE.message.type, this.idListener);
     this.add.image(400, 400, "bg");
     let dom1 = this.add.dom(400, 300).createFromCache("login");
     let registerButton = getButton(this, "Register", () => {
@@ -25,13 +25,14 @@ export default class LoginScene extends Phaser.Scene {
     });
     const hostButton = getButton(this, "Save Host", async () => {
       let host = document.getElementById("host").value;
-      const socket = await isSocketOpen(null, this.game, host);
+      const socket = await isSocketOpen(null, this, host);
+      // console.log(socket);
       if (socket == null) return;
       hostButton.setVisible(false);
       const elt = document.getElementById("hostdiv");
       elt.style.display = "none";
-      this.registry.set("socket", socket);
-      console.log(host);
+      // this.registry.set("socket", socket);
+      // console.log(host);
     });
 
     let buttonContainer = this.add.container(200, 100).setSize(200, 100);
@@ -55,18 +56,15 @@ export default class LoginScene extends Phaser.Scene {
     // this.game.events.off(IDMESSAGE.message.type, this.idListener);
     let email = document.getElementById("email").value;
     let password = document.getElementById("password").value;
-    sendMessage(socket, {
-      type: LOGINMESSAGE.message.type,
-      email,
-      password,
+    let message = { ...LOGINMESSAGE.message, email, password };
+    socket.emit(message.type, message, (result) => {
+      //success
+      if (result.type == IDMESSAGE.message.type) {
+        this.registry.set("name", result.name);
+        this.scene.start(LobbyScene.KEY);
+      } else {
+        console.log("error", result);
+      }
     });
   }
-
-  idListener = async (data) => {
-    // if (message.type != IDMESSAGE.message.type) return;
-    this.registry.set("ID", data.id);
-    this.registry.set("name", data.name);
-    // console.log("received id", data.toString());
-    this.scene.start(LobbyScene.KEY);
-  };
 }
