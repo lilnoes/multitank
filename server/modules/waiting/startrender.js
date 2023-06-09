@@ -9,7 +9,7 @@ export const STARTRENDER = {
    * @returns
    */
   handle: async function (json, socket) {
-    let message = { ...CLIENTSTARTRENDER.message, gameid: json.gameid };
+    let message = { ...this.message, gameid: json.gameid };
     socket.to(json.gameid).emit(message.type, message);
     socket.emit(message.type, message);
   },

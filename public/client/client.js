@@ -20,7 +20,7 @@ export async function isSocketOpen(socket, scene = null, _host = null) {
         scene?.registry?.set("ID", socket.id);
         console.log("connected id", socket.id);
         socket.onAny((event, json) => {
-          scene.game.events.emit(event.type, json);
+          scene.game.events.emit(event, json);
           console.log("event", event, json);
         });
         res(socket);

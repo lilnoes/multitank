@@ -19,6 +19,9 @@ app.use("/server", express.static(path.join(__dirname, "server")));
 
 io.on("connection", (socket) => {
   CLIENTS.set(socket.id, socket);
+  // socket.onAny((event, json) => {
+  // console.log(event, json);
+  // });
   registerEvents(socket)
     .then(null)
     .catch((res) => {

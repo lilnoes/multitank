@@ -22,6 +22,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   handleGameStart = (data) => {
+    console.log("staring", data);
     this.gameid = data.gameid;
     this.speed = data.speed;
     // if (data.type != GAMESTART.message.type) return;
@@ -31,13 +32,18 @@ export default class GameScene extends Phaser.Scene {
 
   create({ gameid }) {
     this.gameid = gameid;
+    console.log("created scene", gameid);
     [this.socket, this.ID] = getSocketID(this);
+    this.socket.onAny((event, msg) => {
+      console.log("from game", event, msg);
+    });
     this.game.events.on(GAMESTART.message.type, this.handleGameStart);
     this.game.events.on(GAMEUPDATE.message.type, this.handleGameUpdate);
     this.game.events.on(GAMEBULLET.message.type, this.handleBulletUpdate);
     this.game.events.on(GAMEEND.message.type, this.handleGameEnd);
 
     this.events.on("shutdown", () => {
+      console.log("created scene shutoff");
       this.game.events.off(GAMESTART.message.type, this.handleGameUpdate);
       this.game.events.off(GAMEBULLET.message.type, this.handleBulletUpdate);
       this.game.events.off(GAMEEND.message.type, this.handleGameEnd);

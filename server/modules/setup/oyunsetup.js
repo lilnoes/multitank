@@ -20,7 +20,7 @@ export const OYUNSETUP = {
     });
 
     //join the room
-    socket.join(json.gameid);
+    await socket.join(json.gameid);
 
     for (let game of GAMES.values()) {
       let message = {

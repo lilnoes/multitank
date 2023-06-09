@@ -1,5 +1,4 @@
 import { GAMEREADY } from "../../../../server/modules/playing/gameready.js";
-import { CLIENTSTARTRENDER } from "../../../../server/modules/waiting/clientstartrender.js";
 import { NEWGAMEUSER } from "../../../../server/modules/waiting/newgameuser.js";
 import { REGISTERGAMEUSER } from "../../../../server/modules/waiting/registergameuser.js";
 import { RENDERPROGRESS } from "../../../../server/modules/waiting/renderprogress.js";
@@ -40,7 +39,7 @@ export default class OyunBeklemeScene extends Phaser.Scene {
     }).setPosition(400, 50);
 
     this.group = this.add.group();
-    this.game.events.on(CLIENTSTARTRENDER.message.type, this.handleStartRender);
+    this.game.events.on(STARTRENDER.message.type, this.handleStartRender);
     getButton(this, "Start", () => {
       let message = { ...STARTRENDER.message, gameid };
       sendMessage(this.socket, message);
@@ -50,6 +49,7 @@ export default class OyunBeklemeScene extends Phaser.Scene {
   }
 
   handleStartRender = async (data) => {
+    // console.log(data.gameid, this.gameid);
     // if (data.type != CLIENTSTARTRENDER.message.type) return;
     if (data.gameid != this.gameid) return;
     this.scene.launch(GameScene.KEY, { gameid: this.gameid });
@@ -64,11 +64,12 @@ export default class OyunBeklemeScene extends Phaser.Scene {
     });
     this.scene.get(GameScene.KEY).events.once("start", () => {
       this.scene.setVisible(false, GameScene.KEY);
+      console.log("off scene");
     });
-    if (!this.owner) return;
-    await sleep(2000);
-    let message = { ...GAMEREADY.message, gameid: this.gameid };
-    sendMessage(this.socket, message);
+    // if (!this.owner) return;
+    // await sleep(2000);
+    // let message = { ...GAMEREADY.message, gameid: this.gameid };
+    // sendMessage(this.socket, message);
   };
 
   addToGroup(name) {

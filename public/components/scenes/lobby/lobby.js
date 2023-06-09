@@ -16,8 +16,7 @@ export default class LobbyScene extends Phaser.Scene {
   }
   create() {
     console.log("create");
-    const [socket, ID] = getSocketID(this);
-    this.socket = socket;
+    [this.socket, this.ID] = getSocketID(this);
     this.game.events.on(CLIENTCHAT.message.type, this.messageHandler);
     this.game.events.on(LOBBYUSER.message.type, this.userHandler);
     this.game.events.on(LOBBYGAME.message.type, this.gameHandler);

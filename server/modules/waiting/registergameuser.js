@@ -21,7 +21,7 @@ export const REGISTERGAMEUSER = {
       life: 100,
     };
 
-    socket.join(json.gameid);
+    await socket.join(json.gameid);
 
     const game = GAMES.get(json.gameid);
     game.users.set(json.ID, user);
@@ -34,6 +34,7 @@ export const REGISTERGAMEUSER = {
       };
 
       socket.to(json.gameid).emit(message.type, message);
+      socket.emit(message.type, message);
     }
   },
 };
